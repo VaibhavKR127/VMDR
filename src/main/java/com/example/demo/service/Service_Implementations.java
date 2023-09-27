@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,8 +50,13 @@ public class Service_Implementations implements Service_Declarations{
 	@Transactional
 	public Assets getAssetsByCode(String code) {
 		// TODO Auto-generated method stub
-		Assets asset = arep.findById(code).get();
-		return asset;
+		//return arep.findById(code).orElse(null);
+		Optional<Assets> asset = arep.findById(code);
+	    if(asset.isPresent()) {
+	        Assets asset1 = asset.get();
+	    	return asset1;
+	    }
+	    return null;
 	}
 
 	
