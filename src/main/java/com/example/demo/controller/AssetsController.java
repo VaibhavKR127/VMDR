@@ -97,11 +97,12 @@ private Service_Implementations serimp;
 ////		File file = fileResource.getFile();
 //		//FileInputStream fis=new FileInputStream(file.); 
 		 int len = exfile.getOriginalFilename().length(); 
+		// System.out.println(exfile.getContentType());
 		 if (exfile.isEmpty()) {
 	            return "Please select a file to upload.";
 	        }
 		
-		 else if(exfile.getOriginalFilename().substring(len-4, len).equalsIgnoreCase("xlsx")) {
+		 else if(exfile.getOriginalFilename().substring(len-4, len).equalsIgnoreCase("xlsx") || exfile.getContentType().equalsIgnoreCase("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") ) {
 			// return "File format not supported";
 			 
 			 try {
