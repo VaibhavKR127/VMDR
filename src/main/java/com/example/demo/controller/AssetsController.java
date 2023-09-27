@@ -38,7 +38,7 @@ import com.example.demo.service.Service_Implementations;
 
 @RestController
 @RequestMapping("assets")
-@CrossOrigin(origins = {"http://13.234.30.235", "http://localhost:4200"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"})
 public class AssetsController {
 
 	
@@ -124,6 +124,8 @@ private Service_Implementations serimp;
 					//for(Row row: sheet)     //iteration over row using for each loop  
 					{  
 			        	Row row = sheet.getRow(i);
+			        	 int cellCount = row.getLastCellNum();
+			        	if(cellCount==8 || cellCount==9) {
 						Assets asset = new Assets(); 
 						asset.setAssetCode(row.getCell(0).toString()); 
 						asset.setAssetName(row.getCell(1).toString());
@@ -132,10 +134,12 @@ private Service_Implementations serimp;
 						asset.setAssetType(row.getCell(4).toString());
 						asset.setPrimaryAssetOwner(row.getCell(5).toString());
 						asset.setSecondaryAssetOwner(row.getCell(6).toString());
-							
+						
+						if(row.getCell(7).getCellType()==0)
+						{
 						double excelDate = row.getCell(7).getNumericCellValue();
 				        java.util.Date utilDate = DateUtil.getJavaDate(excelDate);
-
+				        
 				        // Format the date as yyyy-MM-dd
 				        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 				        String formattedDate = sdf.format(utilDate);
@@ -143,8 +147,15 @@ private Service_Implementations serimp;
 				        // Create a SQL Date object
 				        Date creationDate = Date.valueOf(formattedDate);
 				        asset.setCreationDate(creationDate);
+						}
+						else {
+							return "Wrong Date format";
+						}
 				        serimp.insertAssets(asset);
-
+			        	}
+			        	else {
+			        		return "Wrong Excel format";
+			        	}
 			    }
 					  
 					return "success";
