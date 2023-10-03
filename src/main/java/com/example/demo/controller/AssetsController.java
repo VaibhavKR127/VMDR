@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Date;
@@ -11,14 +12,18 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.xmlbeans.impl.schema.FileResourceLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -186,5 +191,101 @@ private Service_Implementations serimp;
 		}
 		return "Success";
 		}	
+	}
+	
+	
+	@GetMapping("export")
+	public ResponseEntity<Resource> displayAllComp(@RequestBody List<Assets> assets) throws IOException{
+		
+		XSSFWorkbook wb=new XSSFWorkbook();
+		Sheet sheet = wb.createSheet("Sheet1");
+		//XSSFSheet sheet=wb.getSheetAt(0);  
+		//FormulaEvaluator formulaEvaluator=wb.getCreationHelper().createFormulaEvaluator();  
+		//sheet.createRow(assets.size()+1);
+		Row indexrow = sheet.createRow(0);
+		Cell cell0 = indexrow.createCell(0);
+		cell0.setCellValue("Asset Code");
+		
+		Cell cell1 = indexrow.createCell(1);
+		cell1.setCellValue("Asset Name");
+		
+		Cell cell2 = indexrow.createCell(2);
+		cell2.setCellValue("Host Name");
+		
+		Cell cell3 = indexrow.createCell(3);
+		cell3.setCellValue("IP Address");
+		
+		Cell cell4 = indexrow.createCell(4);
+		cell4.setCellValue("Asset Type");
+		
+		Cell cell5 = indexrow.createCell(5);
+		cell5.setCellValue("Primary Asset Owner");
+		
+		Cell cell6 = indexrow.createCell(6);
+		cell6.setCellValue("Secondary Asset Owner");
+		
+		Cell cell7 = indexrow.createCell(7);
+		cell7.setCellValue("Creation Date");
+		
+		Cell cell8 = indexrow.createCell(8);
+		cell8.setCellValue("Last Modified");
+		
+		int rowind=1;
+		for(Assets asset:assets) {
+			Row row = sheet.createRow(rowind);
+			Cell dcell0 = row.createCell(0);
+			dcell0.setCellValue(asset.getAssetCode());
+			
+			Cell dcell1 = row.createCell(1);
+			dcell1.setCellValue(asset.getAssetName());
+			
+			Cell dcell2 = row.createCell(2);
+			dcell2.setCellValue(asset.getHostName());
+			
+			Cell dcell3 = row.createCell(3);
+			dcell3.setCellValue(asset.getIpAddress());
+			
+			Cell dcell4 = row.createCell(4);
+			dcell4.setCellValue(asset.getAssetType());
+			
+			Cell dcell5 = row.createCell(5);
+			dcell5.setCellValue(asset.getPrimaryAssetOwner());
+			
+			Cell dcell6 = row.createCell(6);
+			dcell6.setCellValue(asset.getSecondaryAssetOwner());
+			
+			Cell dcell7 = row.createCell(7);
+			dcell7.setCellValue(asset.getCreationDate());
+			CellStyle cellStyle = wb.createCellStyle();
+	        cellStyle.setDataFormat(wb.getCreationHelper().createDataFormat().getFormat("dd-MM-yyyy"));
+	        dcell7.setCellStyle(cellStyle);
+		
+			Cell dcell8 = row.createCell(8);
+			dcell8.setCellValue(asset.getLastModified());
+	        dcell8.setCellStyle(cellStyle);
+			rowind++;
+		}
+		
+		 try (FileOutputStream outputStream = new FileOutputStream("./src/exportData.xlsx")) {
+	            wb.write(outputStream);
+	           // System.out.println("Excel file created successfully.");
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+		 
+		 Resource fileResource =   new FileSystemResource("./src/exportData.xlsx"); // Load your file resource here
+			File file = fileResource.getFile();
+		       // Set appropriate headers for the response
+		       org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+		       headers.add(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\rexport.xlsx\"" );
+		       
+		       // Return the file as a ResponseEntity
+		       return ResponseEntity.ok()
+		               .headers(headers)
+		               .body(fileResource);
+		
+		
+		//return null;
+		
 	}
 }
