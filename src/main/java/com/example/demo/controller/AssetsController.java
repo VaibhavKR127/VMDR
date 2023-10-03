@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -99,7 +100,7 @@ private Service_Implementations serimp;
 	
 	
 	@PostMapping("upload")
-    public String handleFileUpload(@RequestParam("file") List<MultipartFile> exfiles) {
+    public String handleFileUpload(@RequestParam("file") List<MultipartFile> exfiles) throws IOException {
 	//public String handleFileUpload() throws IOException {
 		//Resource fileResource = exfile.getResource();
 //		exfile.get; // Load your file resource here
@@ -123,11 +124,11 @@ private Service_Implementations serimp;
 		 
 		 else if(exfile.getOriginalFilename().substring(len-3, len).equalsIgnoreCase("csv") || exfile.getContentType().equalsIgnoreCase("text/csv") ) 
 		 {
-			 CSVReader reader = null;  
+			 InputStream insp = exfile.getInputStream();
 			 try  
 			 {  
 			 //parsing a CSV file into CSVReader class constructor  
-			 reader = new CSVReader(new FileReader("E:\\csvfile.csv"));  
+				 CSVReader reader = new CSVReader(new InputStreamReader(insp));  
 			 String [] nextLine;  
 			 //reads one line at a time 
 			 reader.readNext();
