@@ -3,9 +3,12 @@ package com.example.demo.controller;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -38,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.entity.Assets;
 import com.example.demo.service.Service_Implementations;
+import com.opencsv.CSVReader;
 
 
 
@@ -116,6 +120,49 @@ private Service_Implementations serimp;
 	            return "Please select a file to upload.";
 	        }
 		
+		 
+		 else if(exfile.getOriginalFilename().substring(len-3, len).equalsIgnoreCase("csv") || exfile.getContentType().equalsIgnoreCase("text/csv") ) 
+		 {
+			 CSVReader reader = null;  
+			 try  
+			 {  
+			 //parsing a CSV file into CSVReader class constructor  
+			 reader = new CSVReader(new FileReader("E:\\csvfile.csv"));  
+			 String [] nextLine;  
+			 //reads one line at a time 
+			 reader.readNext();
+			 while ((nextLine = reader.readNext()) != null)  
+			 { 
+				 Assets asset = new Assets(); 
+				 asset.setAssetCode(nextLine[0]); 
+				 asset.setAssetName(nextLine[1]);
+				 asset.setHostName(nextLine[2]);
+				 asset.setIpAddress(nextLine[3]);
+				 asset.setAssetType(nextLine[4]);
+				 asset.setPrimaryAssetOwner(nextLine[5]);
+				 asset.setSecondaryAssetOwner(nextLine[6]);
+
+				  SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+			        try {
+			            java.util.Date utilDate = dateFormat.parse(nextLine[7]);
+
+			            java.sql.Date creationDate = new java.sql.Date(utilDate.getTime());
+			            asset.setCreationDate(creationDate);
+			          
+			        } catch (ParseException e) {
+			            e.printStackTrace();
+			        }			       
+                 
+                 serimp.insertAssets(asset);
+			 }  
+			 }  
+			 catch (Exception e)   
+			 {  
+			 e.printStackTrace();  
+			 }  
+		 }
+		 
+		 
 		 else if(exfile.getOriginalFilename().substring(len-4, len).equalsIgnoreCase("xlsx") || exfile.getContentType().equalsIgnoreCase("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") ) 
 		 {
 			// return "File format not supported";
@@ -183,18 +230,17 @@ private Service_Implementations serimp;
 				        }
 					 }
 		 
-		 //System.out.println(exfile.getContentType());
-		// System.out.println(exfile.getOriginalFilename().substring(len-4, len));
 		 else {
 		return "file format not supported  ";
 	}
+		 
 		}
 		return "Success";
 		}	
 	}
 	
 	
-	@GetMapping("export")
+	@PostMapping("export")
 	public ResponseEntity<Resource> displayAllComp(@RequestBody List<Assets> assets) throws IOException{
 		
 		XSSFWorkbook wb=new XSSFWorkbook();
@@ -290,4 +336,7 @@ private Service_Implementations serimp;
 		//return null;
 		
 	}
+	
+
+	
 }
