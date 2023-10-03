@@ -247,7 +247,7 @@ private Service_Implementations serimp;
 			
 			Cell dcell4 = row.createCell(4);
 			dcell4.setCellValue(asset.getAssetType());
-			
+			     
 			Cell dcell5 = row.createCell(5);
 			dcell5.setCellValue(asset.getPrimaryAssetOwner());
 			
@@ -259,10 +259,12 @@ private Service_Implementations serimp;
 			CellStyle cellStyle = wb.createCellStyle();
 	        cellStyle.setDataFormat(wb.getCreationHelper().createDataFormat().getFormat("dd-MM-yyyy"));
 	        dcell7.setCellStyle(cellStyle);
-		
+	        
+	        if(asset.getLastModified()!=null) {
 			Cell dcell8 = row.createCell(8);
 			dcell8.setCellValue(asset.getLastModified());
 	        dcell8.setCellStyle(cellStyle);
+	        }
 			rowind++;
 		}
 		
