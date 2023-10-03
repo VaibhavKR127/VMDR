@@ -90,19 +90,29 @@ private Service_Implementations serimp;
 	
 	
 	@PostMapping("upload")
-    public String handleFileUpload(@RequestParam("file") MultipartFile exfile) {
+    public String handleFileUpload(@RequestParam("file") List<MultipartFile> exfiles) {
 	//public String handleFileUpload() throws IOException {
 		//Resource fileResource = exfile.getResource();
 //		exfile.get; // Load your file resource here
 ////		File file = fileResource.getFile();
 //		//FileInputStream fis=new FileInputStream(file.); 
+		
+		
+		if(exfiles.size()<0) {
+			return "Please select a file to upload.";
+		}
+		
+		else {
+		for(MultipartFile exfile: exfiles) {
+				
 		 int len = exfile.getOriginalFilename().length(); 
 		// System.out.println(exfile.getContentType());
 		 if (exfile.isEmpty()) {
 	            return "Please select a file to upload.";
 	        }
 		
-		 else if(exfile.getOriginalFilename().substring(len-4, len).equalsIgnoreCase("xlsx") || exfile.getContentType().equalsIgnoreCase("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") ) {
+		 else if(exfile.getOriginalFilename().substring(len-4, len).equalsIgnoreCase("xlsx") || exfile.getContentType().equalsIgnoreCase("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") ) 
+		 {
 			// return "File format not supported";
 			 
 			 try {
@@ -159,7 +169,7 @@ private Service_Implementations serimp;
 			        	}
 			    }
 					  
-					return "success";
+					//return "success";
 					
 					 }
 					 catch (IOException e) {
@@ -173,5 +183,8 @@ private Service_Implementations serimp;
 		 else {
 		return "file format not supported  ";
 	}
+		}
+		return "Success";
+		}	
 	}
 }
